@@ -5,8 +5,13 @@ public class Main {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		
-		//lol
+		//LOOOOOOOOOOOOOOOL
 
+		MyHashTable t = new MyHashTable(3);
+		t.put("sdxf");
+		t.put("sjhgdxf");
+		t.put("asfd");
+		t.printContents();
 		
 		System.out.println("cacapeepee");
 	}
