@@ -3,66 +3,72 @@ package ass4;
 
 public class MyHashTable {
 
-	int[] hashTable;
+	Element[] hashTable;
 	int a;
 	int b;
 	int p;
 	public MyHashTable(int size) {
-		hashTable = new int[size];
+		hashTable = new Element[size];
 		for (int i = 0; i < size; ++i) {
-			hashTable[i] = -1; // that means it's empty
+			hashTable[i] = null; // that means it's empty
 		}
 		p = 7;
-		a = (int) (Math.random() * (p-1));
-		b = (int) (Math.random() * (p-1));
+		//a = (int) (Math.random() * (p-1));
+		//b = (int) (Math.random() * (p-1));
+		
+		a = 3;
+		b = 4;
 		
 	}
 	
-	public void put(String key) {
-		putIn(key, 33);
+	public void put(String key, String value) {
+		Element ele = new Element(key, value);
+		putIn(ele, 33);
 	}
 	
-	private void putIn(String key, int z) {
+	private void putIn(Element ele, int z) {
 
+		
+		compressHash(keyAsInteger(ele.getKey()), ele);
+		
+	}
+	
+	private int keyAsInteger(String key) {
 		int hash=0;
 		for(int i=0;i<key.length();i++)
-		  hash = z*hash + key.charAt(i);
+		  hash = 33*hash + key.charAt(i);
 		//System.out.println("hash is: " + hash);
 		if (hash < 0)
 			hash = -hash;
 		
-		compressHash(hash);
 		
-	}
-	
-	private void compressHash(int hash) {
 		int size = hashTable.length;
-		
-		//System.out.println("a is : " + a + " and b is: " + b);
-		
 		int f = hash*a+b;
 		if (f < 0)
 			f = -f;
-		
 		int index = (f % p) % size;
 		
+		return index;
+	}
+	
+	public Element get(String key) {
+		return hashTable[keyAsInteger(key)];
+	}
+	
+	
+	private void compressHash(int index, Element ele) {
 		
-		/*
-		System.out.println("hash: " + hash);
-		System.out.println("first mod is: " + (hash*a + b) % p);
-		System.out.println("index in compress is: " + index);
-		*/
-		//System.out.println("putting hash: " + hash + "at index: " + index);
-		if (hashTable[index] == -1)
-			hashTable[index] = hash;
+		
+		if (hashTable[index] == null)
+			hashTable[index] = ele;
 		else
-			handleCollision(index,hash);
+			handleCollision(index, ele);
 		
 		//printContents();
 		 
 	}
 	
-	private void handleCollision(int index,int hash) {
+	private void handleCollision(int index, Element ele) {
 		//System.out.println("handling collision at index: " + index);
 		int j = 1;
 		int newIndex = index;
@@ -77,15 +83,15 @@ public class MyHashTable {
 				newIndex = newIndex % hashTable.length;
 			}
 			System.out.println("newindex: " + newIndex + " after modulo");
-		} while(hashTable[newIndex] != -1);
+		} while(hashTable[newIndex] != null);
 		
-		hashTable[newIndex] = hash;
+		hashTable[newIndex] = ele;
 		
 	}
 	
 	public void printContents() {
 		for(int i = 0; i < hashTable.length; ++i) {
-			System.out.println("Thing at index: " + i + " is: " + hashTable[i]);
+			System.out.println("Element at index " + i + " has the " + hashTable[i]);
 		}
 	}
 }
