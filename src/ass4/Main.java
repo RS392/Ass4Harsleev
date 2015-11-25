@@ -20,15 +20,15 @@ public class Main {
 		
 		t.setEmptyMarkerScheme('A');
 		t.init(100);
+		t.setRehashThreshold(0.5);
+		t.setRehashFactor(2.1);
 		t.setCollisionType('D');
-		double startTime = System.nanoTime();
 		while(in.hasNextLine()) {
 			String s = in.nextLine();
 			t.put(s, s);
-			t.setRehashThreshold(0.5);
+			t.checkForResize();
 		}
-		double endTime = System.nanoTime();
-		System.out.println("it took " + (endTime-startTime) + " nanoseconds baby");
+		//System.out.println("it took " + (endTime-startTime) + " nanoseconds baby");
 		//t.put("abc", "abc");
 		//t.put("dce", "eeee");
 		//t.put("asf", "asf");
@@ -37,6 +37,7 @@ public class Main {
 		//t.printContents();
 		//t.setRehashThreshold(0.5);
 		//t.printContents();
+		t.printHashTableStatistics();
 		System.out.println("cacapeepee");
 		
 		in.close();

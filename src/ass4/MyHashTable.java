@@ -10,7 +10,9 @@ public class MyHashTable {
 	int p;
 	char collisionType;
 	char emptyType;
-	
+	double rehashFactor;
+	double rehashThreshold;
+	int numberOfCollisions;
 	
 	public void setEmptyMarkerScheme(char type) {
 		if(type == 'A' || type == 'N' || type == 'R')
@@ -148,9 +150,10 @@ public class MyHashTable {
 		
 		if (hashTable[index].getKey().equals("AVAILABLE") || ele.getKey().substring(0, 1).equals("- "))
 			hashTable[index] = ele;
-		else
+		else {
 			handleCollision(index, ele);
-		
+			
+		}
 		//printContents();
 		 
 	}
@@ -174,6 +177,7 @@ public class MyHashTable {
 		int b = 1;
 		
 		do {
+			++numberOfCollisions;
 			newIndex = index + j*(keyAsIntegerDH(ele.getKey()));
 			++j;
 			//System.out.println("newindex: " + newIndex);
@@ -192,8 +196,8 @@ public class MyHashTable {
 				int j = 1;
 				int newIndex = index;
 				
-				
 				do {
+					++numberOfCollisions;
 					newIndex = index + j*j;
 					++j;
 				//	System.out.println("newindex: " + newIndex);
@@ -214,24 +218,33 @@ public class MyHashTable {
 	}
 	
 	public void setRehashThreshold(double loadFactor) {
-		int size = hashTable.length;
-		
-		double hashFactor = numberOfElements/(double)size;
+		//int size = hashTable.length;
+		rehashThreshold = loadFactor;
+		//double hashFactor = numberOfElements/(double)size;
 		//System.out.println(hashFactor);
-		if (hashFactor >= loadFactor)
-			setRehashFactor(2.1);
+		//if (hashFactor >= loadFactor)
+		//	setRehashFactor(2.1);
 		
 	}
 	
 	public void setRehashFactor(double factorOrNumber) {
 		// integer case
-		
+		rehashFactor = factorOrNumber;
+	
+	}
+	public void checkForResize() {
+		int size = hashTable.length;
+		double hashFactor = numberOfElements/(double)size;
+		if ( hashFactor >= rehashThreshold)
+			updateTableSize();
+	}
+	private void updateTableSize() {
 		int oldLength = hashTable.length;
 		int newLength = 0;
-		if( factorOrNumber == (int)factorOrNumber) {
-			newLength = oldLength + (int)factorOrNumber;
+		if( rehashFactor == (int)rehashFactor) {
+			newLength = oldLength + (int)rehashFactor;
 		} else { // factor case
-			newLength = (int)(factorOrNumber * oldLength);
+			newLength = (int)(rehashFactor * oldLength);
 		}
 		 Element[] newHashTable = new Element[newLength];
 		 for (int i = 0; i < oldLength; i++) {
@@ -244,9 +257,25 @@ public class MyHashTable {
 		this.hashTable = newHashTable;
 		
 	}
-	
 	public void printHashTableStatistics() {
+		String s = "";
+		s = "Rehash Threshold: " + rehashThreshold + "\n";
+		s += "Rehash Factor: " + rehashFactor + "\n";
+		s += "Collision Handling Type: " + collisionType + "\n";
+		s += "Empty Marcher Scheme Type: " + emptyType + "\n";
+		s += "Size of the table: " + hashTable.length + "\n";
+		s += "Number of elements in table: " + numberOfElements + "\n";
+		s += "Load percentage: " + numberOfElements/(double)hashTable.length*100 + "\n";
+		s += "Number of collisions accounted for: " + numberOfCollisions + "\n";
+		System.out.println(s);
+	}
 	
-		System.out.println("fuck klement, i'm going to win");
+	public void resetHashTableStatistics() {
+		numberOfElements = 0;
+		numberOfCollisions = 0;
+		emptyType = ' ';
+		collisionType = ' ';
+		rehashFactor = 0;
+		rehashThreshold = 0;
 	}
 }
