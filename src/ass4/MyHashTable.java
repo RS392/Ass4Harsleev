@@ -244,4 +244,9 @@ public class MyHashTable {
 		this.hashTable = newHashTable;
 		
 	}
+	
+	public void printHashTableStatistics() {
+	
+		System.out.println("fuck klement, i'm going to win");
+	}
 }
