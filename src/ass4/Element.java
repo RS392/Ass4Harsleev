@@ -9,7 +9,9 @@ public class Element {
 		this.key = key;
 		this.value = value;
 	}
-	
+	public Element() {
+		
+	}
 	public String getKey() {
 		return key;
 	}
