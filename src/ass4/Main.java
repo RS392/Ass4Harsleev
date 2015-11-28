@@ -5,42 +5,68 @@ import java.util.Scanner;
 public class Main {
 
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-		
-		//LOOOOOOOOOOOOOOOL
+		questionD(1); // first set of strings
+		questionD(2); // second set of strings
+	}
+	
+	public static void questionD(int fileNumber) {
 		Scanner in = null;
 		try {
-		in = new Scanner(new FileReader("hash_test_file1.txt"));
+			String fileName = "hash_test_file" + fileNumber + ".txt";
+		in = new Scanner(new FileReader(fileName));
 		} catch(FileNotFoundException e) {
-			System.out.println("loooooooooooooool");
+			System.out.println("Cannot open file");
 		}
-		
-		
 		MyHashTable t = new MyHashTable();
 		
 		t.setEmptyMarkerScheme('A');
+		//t.init(300000);
 		t.init(100);
 		t.setRehashThreshold(0.5);
 		t.setRehashFactor(2.1);
 		t.setCollisionType('D');
-		while(in.hasNextLine()) {
+		String[] stringsFromFile = null;
+		
+		if (fileNumber == 1)
+			stringsFromFile = new String[235886];
+		else if(fileNumber == 2)
+			stringsFromFile = new String[227126];
+		int i = 0;
+		while (in.hasNextLine()) {
 			String s = in.nextLine();
-			t.put(s, s);
+			stringsFromFile[i] = s;
+			++i;
+		}
+		//i)
+		put(t,stringsFromFile,0,1000);
+		put(t,stringsFromFile,1000,3000);
+		put(t,stringsFromFile,3000,5000);
+		put(t,stringsFromFile,5000,10000);
+		put(t,stringsFromFile,10000,50000);
+		put(t,stringsFromFile,50000,100000);
+		put(t,stringsFromFile,100000,150000);
+		put(t,stringsFromFile,150000,200000);
+		if (fileNumber == 1)
+			put(t,stringsFromFile,200000,235886);
+		else if (fileNumber == 2)
+			put(t,stringsFromFile,200000,227126);
+		
+		//t.printContents();
+		//ii)
+		for (int j = 0; j < 10000; ++j) {
+			System.out.println("removing key: " + t.remove(stringsFromFile[j]));
+			
+		}
+		
+		t.printHashTableStatistics();
+		in.close();
+		
+	}
+	public static void put(MyHashTable t, String[] strings,int start, int max) {
+		for (int i = start; i < max; ++i) {
+			String s = strings[i];
+			t.put(s,s);
 			t.checkForResize();
 		}
-		//System.out.println("it took " + (endTime-startTime) + " nanoseconds baby");
-		//t.put("abc", "abc");
-		//t.put("dce", "eeee");
-		//t.put("asf", "asf");
-		
-		
-		//t.printContents();
-		//t.setRehashThreshold(0.5);
-		//t.printContents();
-		t.printHashTableStatistics();
-		System.out.println("cacapeepee");
-		
-		in.close();
 	}
-
 }

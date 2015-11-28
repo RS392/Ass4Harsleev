@@ -13,7 +13,9 @@ public class MyHashTable {
 	double rehashFactor;
 	double rehashThreshold;
 	int numberOfCollisions;
-	
+	public Element[] getHashTable() {
+		return hashTable;
+	}
 	public void setEmptyMarkerScheme(char type) {
 		if(type == 'A' || type == 'N' || type == 'R')
 			emptyType = type;
@@ -30,7 +32,7 @@ public class MyHashTable {
 			//hashTable[i] = null; // that means it's empty
 		}
 		numberOfElements = 0;
-		//p = 7;
+		p = 15485863;
 		//a = (int) (Math.random() * (p-1));
 		//b = (int) (Math.random() * (p-1));
 		
@@ -54,6 +56,15 @@ public class MyHashTable {
 	}
 	
 	private int keyAsInteger(String key) {
+		if (collisionType == 'Q')
+			return keyAsIntegerQH(key);
+		else if (collisionType == 'D')
+			return keyAsIntegerDH(key);
+		else
+			return 0;
+	}
+	
+	private int keyAsIntegerQH(String key) {
 		int hash=0;
 		for(int i=0;i<key.length();i++)
 		  hash = 33*hash + key.charAt(i);
@@ -66,11 +77,11 @@ public class MyHashTable {
 		int f = hash;//*a+b;
 		if (f < 0)
 			f = -f;
-		int index = f % size;//f % p
+		int index = f % size;//f % size
 		
 		return index;
+			
 	}
-	
 	private int keyAsIntegerDH(String key) {
 		int hash=0;
 		for(int i=0;i<key.length();i++)
@@ -84,14 +95,16 @@ public class MyHashTable {
 		int f = hash*2+1;
 		if (f < 0)
 			f = -f;
-		int index = f % size;//f % p
+		int index = f % size;//f % size
 		
 		return index;
 	}
 	
 	public String get(String key) {
 		
-		int i = keyAsInteger(key);
+		
+		int	i = keyAsInteger(key);
+			
 		int p = 0;
 		int j = 1;
 		while (p <= hashTable.length) {
@@ -119,6 +132,7 @@ public class MyHashTable {
 		
 
 		int i = keyAsInteger(key);
+		
 		int p = 0;
 		int j = 1;
 		while (p <= hashTable.length) {
@@ -178,7 +192,7 @@ public class MyHashTable {
 		
 		do {
 			++numberOfCollisions;
-			newIndex = index + j*(keyAsIntegerDH(ele.getKey()));
+			newIndex = index + j*(keyAsInteger(ele.getKey()));
 			++j;
 			//System.out.println("newindex: " + newIndex);
 			
