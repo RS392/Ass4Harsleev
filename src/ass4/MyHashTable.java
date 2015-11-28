@@ -21,6 +21,10 @@ public class MyHashTable {
 	double rehashFactor;
 	double rehashThreshold;
 	int numberOfCollisions;
+	
+	
+	int sizeChanges;
+	
 	public Element[] getHashTable() {
 		return hashTable;
 	}
@@ -50,10 +54,11 @@ public class MyHashTable {
 	}
 	
 	public void put(String key, String value) {
+		checkForResize();
 		Element ele = new Element(key, value);
 		putIn(ele, 33);
 		numberOfElements++;
-		//System.out.println(numberOfElements);
+		//System.out.println("Is tony still here? " + ele.getKey());
 	}
 	
 	private void putIn(Element ele, int z) {
@@ -80,7 +85,6 @@ public class MyHashTable {
 		if (hash < 0)
 			hash = -hash;
 		
-		
 		int size = hashTable.length;
 		int f = hash;//*a+b;
 		if (f < 0)
@@ -98,27 +102,44 @@ public class MyHashTable {
 		if (hash < 0)
 			hash = -hash;
 		
+		int size = hashTable.length;
+		int f = hash;
+		if (f < 0)
+			f = -f;
+		int index = f % size;//f % size
+		if(key.equals("Tinker2")) {
+			System.out.println("index: " + index);
+		}
+		return index;
+	}
+	private int keyAsInteger2ndDH(String key) {
+		int hash=0;
+		for(int i=0;i<key.length();i++)
+		  hash = 33*hash + key.charAt(i);
+		//System.out.println("hash is: " + hash);
+		if (hash < 0)
+			hash = -hash;
 		
 		int size = hashTable.length;
-		int f = hash*2+1;
+		int f = hash*2 + 1;
 		if (f < 0)
 			f = -f;
 		int index = f % size;//f % size
 		
 		return index;
+		
 	}
-	
 	public String get(String key) {
 		
 		
 		int	i = keyAsInteger(key);
-			
+		
 		int p = 0;
 		int j = 1;
 		while (p <= hashTable.length) {
 			
 			Element ele = hashTable[i];
-			if (ele.getKey().equals("AVAILABLE") || ele.getKey().substring(0, 1).equals("- ") ) {
+			if (ele.getKey().equals("AVAILABLE")) {
 				return ele.getKey();
 			}
 			else if (ele.getKey().equals(key)) {
@@ -126,52 +147,88 @@ public class MyHashTable {
 				
 			}
 			else {
-				i = (i + j*j) % hashTable.length;
-				j++;
-				p++;
+				if (collisionType == 'Q') {
+					i = (i + j*j) % hashTable.length;
+					if (i < 0)
+						i = -i;
+					j++;
+					p++;
+				} else if (collisionType == 'D') {
+					i = (i + j * keyAsInteger2ndDH(key)) % hashTable.length;
+					if (i < 0)
+						i = -i;
+					++j;
+					++p;
+				}
 			}
 		}
 		// possible source of error
-		return "AVAIABLE";
+		return "AVAILABLE";
 		//return hashTable[keyAsInteger(key)];
 	}
 	
 	public String remove(String key) {
 		
-
+		boolean tinker2 = false;
+		if (key.equals("Tinker2")) {
+			tinker2 = true;
+		}
 		int i = keyAsInteger(key);
 		
 		int p = 0;
 		int j = 1;
+		//System.out.println("yoyo" + i);
 		while (p <= hashTable.length) {
-			
+			if(tinker2 == true)
+				System.out.println(i);
+			//System.out.println(i);
 			Element ele = hashTable[i];
-			if (ele.getKey().equals("AVAILABLE") || ele.getKey().substring(0, 1).equals("- ")) {
+			if (ele.getKey().equals("AVAILABLE") ) {
+				
 				return ele.getKey();
 			}
 			else if (ele.getKey().equals(key)) {
-				if (emptyType == 'N')
+				if (emptyType == 'N') {
 				hashTable[i].setKey("- " + hashTable[i].getKey());
-				else
+				hashTable[i].setValue("- " + hashTable[i].getValue());
+				}
+				else {
 					hashTable[i].setKey("AVAILABLE");
+					hashTable[i].setValue("");
+				}
 				numberOfElements--;
 				return ele.getValue();
 				
 			}
 			else {
+				if (collisionType == 'Q') {
 				i = (i + j*j) % hashTable.length;
+				if (i < 0)
+					i = -i;
+				
 				j++;
 				p++;
+				
+			} else if (collisionType == 'D') {
+				i = (i + j * keyAsInteger2ndDH(key)) % hashTable.length;
+				if (i < 0)
+					i = -i;
+
+				++j;
+				++p;
 			}
+		}
 		}
 		// possible source of error
 		return "AVAILABLE";
 		}
 	
 	private void compressHash(int index, Element ele) {
-		
-		if (hashTable[index].getKey().equals("AVAILABLE") || ele.getKey().substring(0, 1).equals("- "))
+		//System.out.println("Is tonyyyyyyyyyyyy still here? " + ele.getKey() + index);
+		if (hashTable[index].getKey().equals("AVAILABLE") ) {
+			
 			hashTable[index] = ele;
+		}
 		else {
 			handleCollision(index, ele);
 			
@@ -195,20 +252,24 @@ public class MyHashTable {
 		
 		int j = 1;
 		int newIndex = index;
-		int a = 2;
-		int b = 1;
 		
 		do {
+			//System.out.println("waaaaaaaaaaaaaaaa");
 			++numberOfCollisions;
-			newIndex = index + j*(keyAsInteger(ele.getKey()));
+			newIndex = index + j*(keyAsInteger2ndDH(ele.getKey()));
 			++j;
 			//System.out.println("newindex: " + newIndex);
-			
+			if (newIndex < 0)
+				newIndex = -newIndex;
 			if(newIndex >= hashTable.length) {
 				newIndex = newIndex % hashTable.length;
 			}
+			//System.out.println(newIndex);
 			//System.out.println("newindex: " + newIndex + " after modulo");
-		} while(hashTable[newIndex].getKey().equals("AVAIABLE") || ele.getKey().substring(0, 1).equals("- "));
+			if(ele.getKey().equals("Tinker2")) {
+				System.out.println("tinker been handled yo: " + newIndex);
+			}
+		} while(!hashTable[newIndex].getKey().equals("AVAILABLE"));
 		
 		hashTable[newIndex] = ele;
 
@@ -217,7 +278,7 @@ public class MyHashTable {
 		//System.out.println("handling collision at index: " + index);
 				int j = 1;
 				int newIndex = index;
-				
+				//System.out.println("should be handling chiupap" + ele.getKey());
 				do {
 					++numberOfCollisions;
 					newIndex = index + j*j;
@@ -228,7 +289,7 @@ public class MyHashTable {
 						newIndex = newIndex % hashTable.length;
 					}
 					//System.out.println("newindex: " + newIndex + " after modulo");
-				} while(hashTable[newIndex].getKey().equals("AVAILABLE") || ele.getKey().substring(0, 1).equals("- "));
+				} while(!hashTable[newIndex].getKey().equals("AVAILABLE"));
 				
 				hashTable[newIndex] = ele;
 				
@@ -261,6 +322,7 @@ public class MyHashTable {
 			updateTableSize();
 	}
 	private void updateTableSize() {
+		//System.out.println("resizing");
 		int oldLength = hashTable.length;
 		int newLength = 0;
 		if( rehashFactor == (int)rehashFactor) {
@@ -268,16 +330,22 @@ public class MyHashTable {
 		} else { // factor case
 			newLength = (int)(rehashFactor * oldLength);
 		}
-		 Element[] newHashTable = new Element[newLength];
-		 for (int i = 0; i < oldLength; i++) {
-			 newHashTable[i] = hashTable[i];
+		 Element[] oldHashTable = hashTable;
+		 hashTable = new Element[newLength];
+		 for (int i = 0; i < newLength; ++i) {
+			hashTable[i] = new Element();
+		    hashTable[i].setKey("AVAILABLE");
 		 }
-		 for (int i = oldLength; i < newLength; ++i) {
-			 newHashTable[i] = new Element();
-			 newHashTable[i].setKey("AVAILABLE");
-		 }
-		this.hashTable = newHashTable;
 		
+		 for (int i = 0; i < oldLength; ++i) {
+			 String s = oldHashTable[i].getKey();
+			 if (!s.equals("AVAILABLE") && !s.substring(0, 1).equals("- ")) {
+				 --numberOfElements;
+				// System.out.println("changing position of: " + s);
+				put(s, s);
+			 }
+		 }
+		 
 	}
 	public void printHashTableStatistics() {
 		String s = "";

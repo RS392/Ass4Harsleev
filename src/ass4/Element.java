@@ -21,7 +21,8 @@ public class Element {
 	}
 	
 	public Element() {
-		
+		this.key = "";
+		this.value = "";
 	}
 	
 	// getter for the key
