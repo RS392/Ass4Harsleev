@@ -1,3 +1,11 @@
+/* By: Radu Saghin and Ashley Lee (26663486)
+ * COMP 352, Assignment 4
+ * 
+ * The implementation of the Hash Table ADT. It gives a key value to each value of an Element, and places them into an array
+ *  based on the key value. When collisions occur, two types of collision handling are implemented for the user to select: 
+ *  quadratic probing and double hashing.
+ */
+
 
 package ass4;
 
