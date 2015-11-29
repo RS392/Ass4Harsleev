@@ -1,4 +1,5 @@
-/* By: Radu Saghin and Ashley Lee (26663486)
+/* By: Radu Alexandru Saghin (27667086) and Ashley Lee (26663486)
+
  * COMP 352, Assignment 4
  * 
  * The Hash table implemented will store objects of type Element, where each Element will two take string variables:

@@ -1,9 +1,11 @@
-/* By: Radu Saghin and Ashley Lee (26663486)
+/* By: Radu Alexandru Saghin ((27667086) and Ashley Lee (26663486)
  * COMP 352, Assignment 4
  * 
  * The implementation of the Hash Table ADT. It gives a key value to each value of an Element, and places them into an array
  *  based on the key value. When collisions occur, two types of collision handling are implemented for the user to select: 
  *  quadratic probing and double hashing.
+ *  
+ *  Additional cases are handled, such as setting the marker scheme and adjusting table sizes to fit the number of elements added.
  */
 
 
@@ -25,15 +27,20 @@ public class MyHashTable {
 	
 	int sizeChanges;
 	
+	// getter for the hash table
 	public Element[] getHashTable() {
 		return hashTable;
 	}
+	
+	// 
 	public void setEmptyMarkerScheme(char type) {
 		if(type == 'A' || type == 'N' || type == 'R')
 			emptyType = type;
 		else
 			System.out.println("Cannot accept any other character");
 	}
+	
+	// initializes the hash table with objects of Element
 	public void init(int size) {
 		hashTable = new Element[size];
 		for (int i = 0; i < size; ++i) {
@@ -41,7 +48,7 @@ public class MyHashTable {
 				hashTable[i] = new Element();
 				hashTable[i].setKey("AVAILABLE");
 			}
-			//hashTable[i] = null; // that means it's empty
+			
 		}
 		numberOfElements = 0;
 		p = 15485863;
@@ -53,13 +60,14 @@ public class MyHashTable {
 		
 	}
 	
+	// takes two strings, and puts them into the hash table as an object of Element. Keeps track of the number of Elements in the hash table, as well.
 	public void put(String key, String value) {
 		checkForResize();
 		Element ele = new Element(key, value);
 		putIn(ele, 33);
 		numberOfElements++;
-		//System.out.println("Is tony still here? " + ele.getKey());
 	}
+	
 	
 	private void putIn(Element ele, int z) {
 
@@ -68,6 +76,7 @@ public class MyHashTable {
 		
 	}
 	
+	// sets the collision type if there is collision handling with the keys
 	private int keyAsInteger(String key) {
 		if (collisionType == 'Q')
 			return keyAsIntegerQH(key);
@@ -77,51 +86,54 @@ public class MyHashTable {
 			return 0;
 	}
 	
+	// turns the string into an integer value that would be used as the key (for quadratic probing)
 	private int keyAsIntegerQH(String key) {
 		int hash=0;
 		for(int i=0;i<key.length();i++)
-		  hash = 33*hash + key.charAt(i);
-		//System.out.println("hash is: " + hash);
+		  hash = 33*hash + key.charAt(i); // hash code map that turns the string into a key value integer
+		
 		if (hash < 0)
-			hash = -hash;
+			hash = -hash; // fixes the error if the key turns out to be a negative number
 		
 		int size = hashTable.length;
-		int f = hash;//*a+b;
-		if (f < 0)
+		int f = hash;
+		if (f < 0) // fixes the error if the key turns out to be a negative number
 			f = -f;
-		int index = f % size;//f % size
+		int index = f % size; // the hash function for quadratic probing
 		
 		return index;
 			
 	}
+	
+	// turns the string into an integer value that would be used as the key (for double hashing)
 	private int keyAsIntegerDH(String key) {
 		int hash=0;
 		for(int i=0;i<key.length();i++)
-		  hash = 33*hash + key.charAt(i);
-		//System.out.println("hash is: " + hash);
+		  hash = 33*hash + key.charAt(i); // hash code map that turns the string into a key value integer
+		
 		if (hash < 0)
-			hash = -hash;
+			hash = -hash; // handles the case when the key value from the equation above turns out to be negative
 		
 		int size = hashTable.length;
 		int f = hash;
 		if (f < 0)
-			f = -f;
-		int index = f % size;//f % size
-		if(key.equals("Tinker2")) {
-			System.out.println("index: " + index);
-		}
+			f = -f; // fixes the error if the key turns out to be a negative number
+		int index = f % size; // the first hash function for double hashing (same as the quadratic hash function)
+		
 		return index;
 	}
+	
+	// the second hash function for double hashing
 	private int keyAsInteger2ndDH(String key) {
 		int hash=0;
 		for(int i=0;i<key.length();i++)
-		  hash = 33*hash + key.charAt(i);
-		//System.out.println("hash is: " + hash);
+		  hash = 33*hash + key.charAt(i); // hash code map
+		
 		if (hash < 0)
 			hash = -hash;
 		
 		int size = hashTable.length;
-		int f = hash*2 + 1;
+		int f = hash*2 + 1; // second hash function
 		if (f < 0)
 			f = -f;
 		int index = f % size;//f % size
@@ -129,6 +141,8 @@ public class MyHashTable {
 		return index;
 		
 	}
+	
+	// gets the value from a cell in the hash table
 	public String get(String key) {
 		
 		
@@ -139,6 +153,8 @@ public class MyHashTable {
 		while (p <= hashTable.length) {
 			
 			Element ele = hashTable[i];
+			
+			//  indicates if the cell is empty with the AVAILABLE marker
 			if (ele.getKey().equals("AVAILABLE")) {
 				return ele.getKey();
 			}
@@ -147,13 +163,13 @@ public class MyHashTable {
 				
 			}
 			else {
-				if (collisionType == 'Q') {
+				if (collisionType == 'Q') { // collision handling for quadratic probing gets handle here
 					i = (i + j*j) % hashTable.length;
 					if (i < 0)
 						i = -i;
 					j++;
 					p++;
-				} else if (collisionType == 'D') {
+				} else if (collisionType == 'D') { // collision handling for double hashing gets handled here
 					i = (i + j * keyAsInteger2ndDH(key)) % hashTable.length;
 					if (i < 0)
 						i = -i;
@@ -162,31 +178,27 @@ public class MyHashTable {
 				}
 			}
 		}
-		// possible source of error
 		return "AVAILABLE";
-		//return hashTable[keyAsInteger(key)];
 	}
-	
+
+	// removes a specified value from the hash table
 	public String remove(String key) {
 		
-		boolean tinker2 = false;
-		if (key.equals("Tinker2")) {
-			tinker2 = true;
-		}
 		int i = keyAsInteger(key);
 		
 		int p = 0;
 		int j = 1;
-		//System.out.println("yoyo" + i);
+
 		while (p <= hashTable.length) {
-			if(tinker2 == true)
-				System.out.println(i);
-			//System.out.println(i);
+		
 			Element ele = hashTable[i];
+			
+			// if it's already empty, then nothing happens
 			if (ele.getKey().equals("AVAILABLE") ) {
 				
 				return ele.getKey();
 			}
+			// removes the old value, but replaces it with a -, followed by the old value to indicate it has been removed
 			else if (ele.getKey().equals(key)) {
 				if (emptyType == 'N') {
 				hashTable[i].setKey("- " + hashTable[i].getKey());
@@ -196,10 +208,11 @@ public class MyHashTable {
 					hashTable[i].setKey("AVAILABLE");
 					hashTable[i].setValue("");
 				}
-				numberOfElements--;
+				numberOfElements--; // because an element has been removed, the number of Elements in the hash table decreases
 				return ele.getValue();
 				
 			}
+			// collision handling if it comes to the case
 			else {
 				if (collisionType == 'Q') {
 				i = (i + j*j) % hashTable.length;
@@ -223,24 +236,24 @@ public class MyHashTable {
 		return "AVAILABLE";
 		}
 	
+	// 
 	private void compressHash(int index, Element ele) {
-		//System.out.println("Is tonyyyyyyyyyyyy still here? " + ele.getKey() + index);
 		if (hashTable[index].getKey().equals("AVAILABLE") ) {
 			
 			hashTable[index] = ele;
 		}
 		else {
 			handleCollision(index, ele);
-			
 		}
-		//printContents();
-		 
 	}
 	
+	// setter for the collision type to be handled
 	public void setCollisionType(char type) {
 		
 		collisionType = type;
 	}
+	
+	// different collision type handling depending on the collision type set
 	private void handleCollision(int index, Element ele) {
 		if (collisionType == 'Q')
 			quadHandle(index,ele);
@@ -248,88 +261,93 @@ public class MyHashTable {
 			doubleHashHandle(index, ele);
 	}
 	
+	// collision handling for double hashing
 	private void doubleHashHandle(int index, Element ele) {
 		
 		int j = 1;
 		int newIndex = index;
 		
+		// when there needs to be handling once or more
 		do {
-			//System.out.println("waaaaaaaaaaaaaaaa");
 			++numberOfCollisions;
-			newIndex = index + j*(keyAsInteger2ndDH(ele.getKey()));
+			newIndex = index + j*(keyAsInteger2ndDH(ele.getKey())); 
 			++j;
-			//System.out.println("newindex: " + newIndex);
 			if (newIndex < 0)
-				newIndex = -newIndex;
+				newIndex = -newIndex;	// handling for a negative key
+			// makes it into a circular array to consider when the new index after collision handling is out of bounds
 			if(newIndex >= hashTable.length) {
 				newIndex = newIndex % hashTable.length;
 			}
-			//System.out.println(newIndex);
-			//System.out.println("newindex: " + newIndex + " after modulo");
-			if(ele.getKey().equals("Tinker2")) {
-				System.out.println("tinker been handled yo: " + newIndex);
-			}
+
 		} while(!hashTable[newIndex].getKey().equals("AVAILABLE"));
 		
 		hashTable[newIndex] = ele;
 
 	}
+	
+	// collision handling for quadratic probing
 	private void quadHandle(int index, Element ele) {
-		//System.out.println("handling collision at index: " + index);
+		
 				int j = 1;
 				int newIndex = index;
-				//System.out.println("should be handling chiupap" + ele.getKey());
+				
 				do {
 					++numberOfCollisions;
 					newIndex = index + j*j;
 					++j;
-				//	System.out.println("newindex: " + newIndex);
-					
+				
+					// makes it into a circular array to consider when the new index after collision handling is out of bounds
 					if(newIndex >= hashTable.length) {
 						newIndex = newIndex % hashTable.length;
 					}
-					//System.out.println("newindex: " + newIndex + " after modulo");
+					
 				} while(!hashTable[newIndex].getKey().equals("AVAILABLE"));
 				
 				hashTable[newIndex] = ele;
 				
 	}
+	
+	// checks to see what's stored in every index of the table
 	public void printContents() {
 		for(int i = 0; i < hashTable.length; ++i) {
 			System.out.println("Element at index " + i + " has the " + hashTable[i]);
 		}
 	}
 	
+	// setter for the rehash threshold
 	public void setRehashThreshold(double loadFactor) {
-		//int size = hashTable.length;
+	
 		rehashThreshold = loadFactor;
-		//double hashFactor = numberOfElements/(double)size;
-		//System.out.println(hashFactor);
-		//if (hashFactor >= loadFactor)
-		//	setRehashFactor(2.1);
-		
 	}
 	
+	// setter for the rehash factor
 	public void setRehashFactor(double factorOrNumber) {
 		// integer case
 		rehashFactor = factorOrNumber;
 	
 	}
+	
+	// checks to see if the table needs to be resized based on whether the hash factor is greater than the rehash threshold
 	public void checkForResize() {
 		int size = hashTable.length;
 		double hashFactor = numberOfElements/(double)size;
 		if ( hashFactor >= rehashThreshold)
 			updateTableSize();
 	}
+	
+	// updates the table size
 	private void updateTableSize() {
-		//System.out.println("resizing");
+		
 		int oldLength = hashTable.length;
 		int newLength = 0;
+		// if the setRehashThreshold() has an integer set, then the table increases by the integer size given
 		if( rehashFactor == (int)rehashFactor) {
 			newLength = oldLength + (int)rehashFactor;
-		} else { // factor case
+		}
+		else { // factor case, if setRehashThreshold is given a real number, then the size increases to the old size multiplied by the rehash factor
 			newLength = (int)(rehashFactor * oldLength);
 		}
+		// creates a new table with the new size, and sets all the cells to AVAILABLE (empty)
 		 Element[] oldHashTable = hashTable;
 		 hashTable = new Element[newLength];
 		 for (int i = 0; i < newLength; ++i) {
@@ -337,16 +355,17 @@ public class MyHashTable {
 		    hashTable[i].setKey("AVAILABLE");
 		 }
 		
+		 // puts all the objects that were stored from the old sized table to the new one
 		 for (int i = 0; i < oldLength; ++i) {
 			 String s = oldHashTable[i].getKey();
 			 if (!s.equals("AVAILABLE") && !s.substring(0, 1).equals("- ")) {
 				 --numberOfElements;
-				// System.out.println("changing position of: " + s);
 				put(s, s);
 			 }
 		 }
 		 
 	}
+	// prints statistics for the hash table
 	public void printHashTableStatistics() {
 		String s = "";
 		s = "Rehash Threshold: " + rehashThreshold + "\n";
@@ -360,6 +379,7 @@ public class MyHashTable {
 		System.out.println(s);
 	}
 	
+	// resets the statistics for the hash table
 	public void resetHashTableStatistics() {
 		numberOfElements = 0;
 		numberOfCollisions = 0;

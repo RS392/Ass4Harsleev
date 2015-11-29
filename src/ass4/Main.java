@@ -1,3 +1,9 @@
+/* By: Radu Alexandru Saghin ((27667086) and Ashley Lee (26663486)
+ * COMP 352, Assignment 4
+ * 
+ * Tests to see if MyHashTable works like the hash table ADT. Includes the answers to programming questions B and C
+ */
+
 package ass4;
 import java.io.*;
 import java.util.Scanner;
@@ -5,12 +11,17 @@ import java.util.Scanner;
 public class Main {
 
 	public static void main(String[] args) {
-	//	test();
 		
-		//b)
+		// Question b) for the programming assignment
+		
+		questionB('N','Q',10, 0.7, 2.0);	
+		questionB('N','D',16, 0.8, 1.7);
+		questionB('A','Q',20, 0.5, 1.1);
+		questionB('A','D',5, 0.76, 2.5);
 		
 		
-		//c)
+		
+		// Question c) for the programming assignment
 		questionC(1,'A','Q',100); // first set of strings
 		questionC(1,'N','Q',100);
 		questionC(1,'A','D',100);
@@ -22,47 +33,51 @@ public class Main {
 		questionC(2,'N','D',100);
 		
 		questionC(2,'N','D',450000);
+		
 	}
 	
-	public static void test() {
+	// used to answer part B of the programming questions
+	public static void questionB(char emptyType, char collisionType, int size, double loadFactor, double factorOrNumber) {
 		MyHashTable t = new MyHashTable();
 		
-		t.setEmptyMarkerScheme('N');
-		t.init(7);
-		t.setRehashThreshold(0.5);
-		t.setRehashFactor(2.1);
-		t.setCollisionType('D');
+		t.setEmptyMarkerScheme(emptyType);
+		t.setCollisionType(collisionType);
+		t.init(size);
+		t.setRehashThreshold(loadFactor);
+		t.setRehashFactor(factorOrNumber);
 		t.put("Tony", "Tony");
 		t.put("Riki", "Riki");
 		t.put("Chiupap", "Chiupap");
 		t.put("Tinker", "Tinker");
-		t.put("Tony1", "Tony1");
-		t.put("Riki1", "Riki1");
-		t.put("Chiupap1", "Chiupap1");
-		t.put("Tinker1", "Tinker1");
-		t.put("Tony2", "Tony2");
-		t.put("Riki2", "Riki2");
-		t.put("Chiupap2", "Chiupap2");
-		t.put("Tinker2", "Tinker2");
-		t.put("Tony3", "Tony3");
-		t.put("Riki3", "Riki3");
-		t.put("Chiupap3", "Chiupap3");
-		t.put("Tinker3", "Tinker3");
+		t.put("Cancer", "Cancer");
+		t.put("Betty Spaghetti", "Betty Spaghetti");
+		t.put("Sassy Rubick", "Sassy Rubick");
+		t.put("Saladar", "Saladar");
+		t.put("Kebab", "Kebab");
+		t.put("nukelicious", "nukelicious");
+		t.put("Skellington", "Skellington");
+		t.put("pizza-khaleesi", "pizza-khaleesi");
+		t.put("Wilbur Bot", "Wilbur Bot");
+		t.put("asdfghjkl", "asdfghjkl");
+		t.put("gawshzilla", "gawshzilla");
+		t.put("Defrosted icecream", "Defrosted ice cream");
+		
+		// uncomment to see where every Element is stored in the table
+		// t.printContents();
+		System.out.println("");
 		
 		t.remove("Tony");
-		t.remove("Riki");
-		t.remove("Chiupap");
-		t.remove("Tinker");
-		for (int i = 1; i < 4; ++i) {
-			t.remove("Tony" + i);
-			t.remove("Riki" + i);
-			t.remove("Chiupap" + i);
-			t.remove("Tinker" + i);
-		}
-		t.printContents();
+		t.remove("Kebab");
+		t.remove("Skellington");
+		
+		// uncomment to see where every Element is stored in the table after removal
+		// t.printContents();
+	
+		t.printHashTableStatistics();
 		
 	}
 	
+	// used to answer part C of the programming question
 	public static void questionC(int fileNumber, char emptyType, char collisionType, int size) {
 		Scanner in = null;
 		try {
@@ -102,7 +117,6 @@ public class Main {
 		put(t,stringsFromFile,150000,200000);
 		put(t,stringsFromFile,200000,stringsFromFile.length);
 		
-		//t.printContents();
 		//ii)
 		System.out.println("Strings from the file");
 
